@@ -17,6 +17,10 @@ export interface Match {
   status: MatchStatus;
   createdAt: string;
   sets: SetScore[];
+  // NEW: Undo tracking fields
+  lastScoringTeam?: string | null;
+  lastScoreTime?: string | null;
+  undoUsed?: boolean; // NEW: Tracks if undo was used
 }
 
 export type MatchStatus = 'IN_PROGRESS' | 'COMPLETED' | 'PAUSED';
