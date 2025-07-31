@@ -1,5 +1,4 @@
-
-import { api } from './authService'
+import { api } from '@/services/authService';
 import { Match, CreateMatchRequest, TeamType } from '@/types/match';
 
 export const matchService = {
@@ -25,6 +24,15 @@ export const matchService = {
   // Update score
   updateScore: async (matchId: number, team: TeamType): Promise<Match> => {
     const response = await api.put<Match>(`/matches/${matchId}/score`, { team });
+    return response.data;
+  },
+
+  // NEW: Edit current set score
+  editCurrentSetScore: async (matchId: number, team1Score: number, team2Score: number): Promise<Match> => {
+    const response = await api.put<Match>(`/matches/${matchId}/edit-score`, { 
+      team1Score, 
+      team2Score 
+    });
     return response.data;
   },
 

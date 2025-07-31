@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { Match, TeamType } from '@/types/match';
 import { matchService } from '@/services/matchService';
+import EditCurrentScore from './EditCurrentScore';
 
 interface ScoreControlsProps {
   match: Match | null;
@@ -54,6 +55,8 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
       onMatchUpdate(updatedMatch);
     } catch (error) {
       console.error('Error undoing point:', error);
+      // You might want to show a toast/alert here for user feedback
+      alert('Cannot undo: ' + (error as Error).message);
     } finally {
       setLoading(false);
     }
@@ -93,7 +96,7 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
         }}>
           
           {/* Compact landscape controls */}
-          <Stack direction="row" spacing={2} maxWidth="600px" mx="auto">
+          <Stack direction="row" spacing={1} maxWidth="600px" mx="auto">
             <Button
               variant="contained"
               size="large"
@@ -103,7 +106,7 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
               color="primary"
               sx={{ 
                 py: 2,
-                fontSize: '0.9rem',
+                fontSize: '0.8rem',
                 fontWeight: 400,
                 borderRadius: 2,
                 textTransform: 'none',
@@ -122,7 +125,7 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
               color="secondary"
               sx={{ 
                 py: 2,
-                fontSize: '0.9rem',
+                fontSize: '0.8rem',
                 fontWeight: 400,
                 borderRadius: 2,
                 textTransform: 'none',
@@ -139,15 +142,20 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
               disabled={isUndoDisabled()}
               sx={{ 
                 py: 2,
-                fontSize: '0.8rem',
+                fontSize: '0.7rem',
                 fontWeight: 400,
                 textTransform: 'none',
-                minWidth: 60,
-                px: 2
+                minWidth: 50,
+                px: 1
               }}
             >
               Undo
             </Button>
+            
+            <EditCurrentScore 
+              match={match} 
+              onScoreUpdated={onMatchUpdate}
+            />
             
             <Button
               variant="outlined"
@@ -155,11 +163,11 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
               disabled={isUndoDisabled()}
               sx={{ 
                 py: 2,
-                fontSize: '0.8rem',
+                fontSize: '0.7rem',
                 fontWeight: 400,
                 textTransform: 'none',
-                minWidth: 60,
-                px: 2
+                minWidth: 50,
+                px: 1
               }}
             >
               Reset
@@ -294,6 +302,11 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
               >
                 Undo
               </Button>
+              
+              <EditCurrentScore 
+                match={match} 
+                onScoreUpdated={onMatchUpdate}
+              />
               
               <Button
                 variant="outlined"
@@ -463,6 +476,11 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
             >
               Undo
             </Button>
+            
+            <EditCurrentScore 
+              match={match} 
+              onScoreUpdated={onMatchUpdate}
+            />
             
             <Button
               variant="outlined"
