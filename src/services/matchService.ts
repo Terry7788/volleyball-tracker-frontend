@@ -1,4 +1,5 @@
-import { api } from '@/services/AuthService';
+
+import { api } from './authService'
 import { Match, CreateMatchRequest, TeamType } from '@/types/match';
 
 export const matchService = {

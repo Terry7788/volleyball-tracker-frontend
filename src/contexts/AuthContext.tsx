@@ -1,8 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authService, guestService } from '@/services/AuthService';
-
+import { authService, guestService } from '../services/authService';
 interface User {
   username: string;
   email: string;
