@@ -2,7 +2,6 @@
 A modern, responsive web application for tracking volleyball match scores with real-time scoring and professional volleyball rules implementation.
 
 
-✨ Features
 🎯 Core Functionality
 
 Real-time Scoring: Live match tracking with instant updates
