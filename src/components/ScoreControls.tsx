@@ -10,7 +10,9 @@ import {
     Divider,
     Dialog,
     DialogContent,
-    DialogActions
+    DialogActions,
+    Snackbar,
+    Alert
 } from '@mui/material';
 import { Match, TeamType } from '@/types/match';
 import { matchService } from '@/services/matchService';
@@ -31,6 +33,7 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
 }) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [resetDialogOpen, setResetDialogOpen] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     if (!match || match.status !== 'IN_PROGRESS') {
         return null;
@@ -64,7 +67,7 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
             } else if (error instanceof Error) {
                 errorMessage = error.message;
             }
-            alert(errorMessage); // You might want to use a toast/snackbar instead
+            setErrorMessage(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -87,6 +90,10 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
         return loading ||
             (match.team1Score === 0 && match.team2Score === 0) || // No points to undo
             Boolean(match.undoUsed); // Undo was already used
+    };
+
+    const getUndoButtonText = (): string => {
+        return 'Undo'; // Always show "Undo"
     };
 
     // Mobile landscape layout - fixed to bottom
@@ -152,20 +159,25 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
                             disabled={isUndoDisabled()}
                             sx={{
                                 py: 1.5,
-                                fontSize: '0.875rem',
+                                fontSize: '0.7rem',
                                 fontWeight: 400,
                                 textTransform: 'none',
-                                // Add visual indication when disabled due to undo usage
-                                opacity: Boolean(match.undoUsed) ? 0.4 : (isUndoDisabled() ? 0.6 : 1),
-                                borderColor: Boolean(match.undoUsed) ? '#ef4444' : '#525252',
-                                color: Boolean(match.undoUsed) ? '#ef4444' : 'text.secondary',
+                                minWidth: 60,
+                                px: 1,
+                                borderColor: '#525252',
+                                color: 'text.secondary',
+                                '&:hover': {
+                                    borderColor: '#71717a',
+                                    backgroundColor: '#262626',
+                                },
                                 '&:disabled': {
-                                    borderColor: Boolean(match.undoUsed) ? '#ef4444' : '#404040',
-                                    color: Boolean(match.undoUsed) ? '#ef4444' : '#525252',
+                                    borderColor: '#404040',
+                                    color: '#525252',
+                                    opacity: 0.5,
                                 }
                             }}
                         >
-                            {Boolean(match.undoUsed) ? 'Undo Used' : 'Undo'}
+                            {getUndoButtonText()}
                         </Button>
 
                         <EditCurrentScore
@@ -176,7 +188,7 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
                         <Button
                             variant="outlined"
                             onClick={() => setResetDialogOpen(true)}
-                            disabled={isUndoDisabled()}
+                            disabled={match.team1Score === 0 && match.team2Score === 0}
                             sx={{
                                 py: 2,
                                 fontSize: '0.7rem',
@@ -190,6 +202,22 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
                         </Button>
                     </Stack>
                 </Box>
+
+                {/* Error Snackbar */}
+                <Snackbar 
+                    open={!!errorMessage} 
+                    autoHideDuration={4000} 
+                    onClose={() => setErrorMessage(null)}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                >
+                    <Alert 
+                        onClose={() => setErrorMessage(null)} 
+                        severity="error" 
+                        sx={{ width: '100%' }}
+                    >
+                        {errorMessage}
+                    </Alert>
+                </Snackbar>
 
                 {/* Reset Confirmation Dialog */}
                 <Dialog
@@ -313,10 +341,21 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
                                     py: 1.5,
                                     fontSize: '0.875rem',
                                     fontWeight: 400,
-                                    textTransform: 'none'
+                                    textTransform: 'none',
+                                    borderColor: '#525252',
+                                    color: 'text.secondary',
+                                    '&:hover': {
+                                        borderColor: '#71717a',
+                                        backgroundColor: '#262626',
+                                    },
+                                    '&:disabled': {
+                                        borderColor: '#404040',
+                                        color: '#525252',
+                                        opacity: 0.5,
+                                    }
                                 }}
                             >
-                                Undo
+                                {getUndoButtonText()}
                             </Button>
 
                             <EditCurrentScore
@@ -328,7 +367,7 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
                                 variant="outlined"
                                 fullWidth
                                 onClick={() => setResetDialogOpen(true)}
-                                disabled={isUndoDisabled()}
+                                disabled={match.team1Score === 0 && match.team2Score === 0}
                                 sx={{
                                     py: 1.5,
                                     fontSize: '0.875rem',
@@ -348,6 +387,22 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
                         <Box component="span" sx={{ color: 'primary.main' }}>{match.team1Name} {match.team1Score}</Box> • <Box component="span" sx={{ color: 'secondary.main' }}>{match.team2Score} {match.team2Name}</Box>
                     </Typography>
                 </Box>
+
+                {/* Error Snackbar */}
+                <Snackbar 
+                    open={!!errorMessage} 
+                    autoHideDuration={4000} 
+                    onClose={() => setErrorMessage(null)}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                >
+                    <Alert 
+                        onClose={() => setErrorMessage(null)} 
+                        severity="error" 
+                        sx={{ width: '100%' }}
+                    >
+                        {errorMessage}
+                    </Alert>
+                </Snackbar>
 
                 {/* Reset Confirmation Dialog */}
                 <Dialog
@@ -487,10 +542,21 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
                                 py: 1.5,
                                 fontSize: '0.875rem',
                                 fontWeight: 400,
-                                textTransform: 'none'
+                                textTransform: 'none',
+                                borderColor: '#525252',
+                                color: 'text.secondary',
+                                '&:hover': {
+                                    borderColor: '#71717a',
+                                    backgroundColor: '#262626',
+                                },
+                                '&:disabled': {
+                                    borderColor: '#404040',
+                                    color: '#525252',
+                                    opacity: 0.5,
+                                }
                             }}
                         >
-                            Undo
+                            {getUndoButtonText()}
                         </Button>
 
                         <EditCurrentScore
@@ -502,7 +568,7 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
                             variant="outlined"
                             fullWidth
                             onClick={() => setResetDialogOpen(true)}
-                            disabled={isUndoDisabled()}
+                            disabled={match.team1Score === 0 && match.team2Score === 0}
                             sx={{
                                 py: 1.5,
                                 fontSize: '0.875rem',
@@ -522,6 +588,22 @@ const ScoreControls: React.FC<ScoreControlsProps> = ({
                     <Box component="span" sx={{ color: 'primary.main' }}>{match.team1Name} {match.team1Score}</Box> • <Box component="span" sx={{ color: 'secondary.main' }}>{match.team2Score} {match.team2Name}</Box>
                 </Typography>
             </Box>
+
+            {/* Error Snackbar */}
+            <Snackbar 
+                open={!!errorMessage} 
+                autoHideDuration={4000} 
+                onClose={() => setErrorMessage(null)}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert 
+                    onClose={() => setErrorMessage(null)} 
+                    severity="error" 
+                    sx={{ width: '100%' }}
+                >
+                    {errorMessage}
+                </Alert>
+            </Snackbar>
 
             {/* Reset Confirmation Dialog */}
             <Dialog
