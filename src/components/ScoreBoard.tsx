@@ -4,11 +4,10 @@ import {
   CardContent, 
   Typography, 
   Box, 
-  Chip, 
-  Divider,
+  Chip,
   Stack
 } from '@mui/material';
-import { Match, MatchStatus } from '@/types/match';
+import { Match } from '@/types/match';
 import EditSet from './EditSet';
 
 interface ScoreBoardProps {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   ThemeProvider,
   CssBaseline,
@@ -11,7 +11,6 @@ import {
   CardContent,
   Chip,
   CircularProgress,
-  Alert,
   Button,
   Stack,
   Tabs,
@@ -48,14 +47,7 @@ const AppContent: React.FC = () => {
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const isLandscape = useMediaQuery('(orientation: landscape)');
 
-  // Load matches when auth state changes or when component mounts
-  useEffect(() => {
-    if (!authLoading && (isAuthenticated || isGuest)) {
-      loadMatches();
-    }
-  }, [authLoading, isAuthenticated, isGuest, guestSession?.sessionId]);
-
-  const loadMatches = async (): Promise<void> => {
+  const loadMatches = useCallback(async (): Promise<void> => {
     try {
       setLoading(true);
       setError(null);
@@ -77,17 +69,29 @@ const AppContent: React.FC = () => {
         setCurrentMatch(null);
         console.log('No matches found');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading matches:', error);
-      if (error.response?.status === 401) {
-        setError('Session expired. Please refresh the page.');
+      if (error && typeof error === 'object' && 'response' in error) {
+        const err = error as { response?: { status?: number } };
+        if (err.response?.status === 401) {
+          setError('Session expired. Please refresh the page.');
+        } else {
+          setError('Unable to connect to the server. Please check if the backend is running.');
+        }
       } else {
         setError('Unable to connect to the server. Please check if the backend is running.');
       }
     } finally {
       setLoading(false);
     }
-  };
+  }, [getCurrentUserType]);
+
+  // Load matches when auth state changes or when component mounts
+  useEffect(() => {
+    if (!authLoading && (isAuthenticated || isGuest)) {
+      loadMatches();
+    }
+  }, [authLoading, isAuthenticated, isGuest, guestSession?.sessionId, loadMatches]);
 
   const handleMatchCreated = async (newMatch: Match): Promise<void> => {
     console.log('New match created:', newMatch.id);

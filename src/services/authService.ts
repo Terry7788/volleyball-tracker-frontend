@@ -115,6 +115,7 @@ export const guestService = {
       const response = await api.get<ValidationResponse>(`/guest/session/${sessionId}/validate`);
       return response.data.valid;
     } catch (error) {
+      console.log('Session validation failed');
       return false;
     }
   },

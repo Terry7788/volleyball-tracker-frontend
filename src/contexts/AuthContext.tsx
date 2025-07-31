@@ -1,7 +1,8 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authService, guestService } from '../services/authService';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { authService, guestService } from '@/services/authService';
+
 interface User {
   username: string;
   email: string;
@@ -44,12 +45,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [guestSession, setGuestSession] = useState<GuestSession | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Initialize auth state on app load
-  useEffect(() => {
-    initializeAuth();
+  const createGuestSession = useCallback(async (): Promise<void> => {
+    try {
+      const guestData = await guestService.createSession();
+      setGuestSession(guestData);
+      localStorage.setItem('guest_session', JSON.stringify(guestData));
+      console.log('Guest session created:', guestData.sessionId);
+    } catch (error) {
+      console.error('Failed to create guest session:', error);
+      throw error;
+    }
   }, []);
 
-  const initializeAuth = async (): Promise<void> => {
+  const initializeAuth = useCallback(async (): Promise<void> => {
     try {
       setLoading(true);
 
@@ -102,7 +110,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [createGuestSession]);
+
+  // Initialize auth state on app load
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
 
   const login = async (username: string, password: string): Promise<void> => {
     try {
@@ -159,18 +172,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     // Refresh the page to reset the app state
     window.location.reload();
-  };
-
-  const createGuestSession = async (): Promise<void> => {
-    try {
-      const guestData = await guestService.createSession();
-      setGuestSession(guestData);
-      localStorage.setItem('guest_session', JSON.stringify(guestData));
-      console.log('Guest session created:', guestData.sessionId);
-    } catch (error) {
-      console.error('Failed to create guest session:', error);
-      throw error;
-    }
   };
 
   const clearGuestSession = (): void => {

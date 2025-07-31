@@ -9,11 +9,8 @@ import {
   Stack,
   Dialog,
   DialogContent,
-  CircularProgress,
-  Fab,
-  Divider
+  CircularProgress
 } from '@mui/material';
-import { Add } from '@mui/icons-material';
 import { Match } from '@/types/match';
 import { matchService } from '@/services/matchService';
 

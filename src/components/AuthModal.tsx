@@ -13,8 +13,7 @@ import {
   Tabs,
   Tab,
   CircularProgress,
-  Alert,
-  Divider
+  Alert
 } from '@mui/material';
 import { Person, PersonAdd, SportsVolleyball } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
@@ -62,8 +61,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
     try {
       await login(loginUsername.trim(), loginPassword);
       handleClose();
-    } catch (error: any) {
-      setError(error.response?.data?.message || 'Login failed. Please check your credentials.');
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'response' in error) {
+        const err = error as { response?: { data?: { message?: string } } };
+        setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+      } else {
+        setError('Login failed. Please check your credentials.');
+      }
     } finally {
       setLoading(false);
     }
@@ -89,8 +93,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
     try {
       await register(registerUsername.trim(), registerEmail.trim(), registerPassword);
       handleClose();
-    } catch (error: any) {
-      setError(error.response?.data?.message || 'Registration failed. Please try again.');
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'response' in error) {
+        const err = error as { response?: { data?: { message?: string } } };
+        setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      } else {
+        setError('Registration failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
